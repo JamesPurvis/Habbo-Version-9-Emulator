@@ -14,6 +14,7 @@ namespace Emulator.Messages.Incoming.Messenger
     {
         public void invokeEvent(HabboRequest r, GameSession s)
         {
+            s.return_messenger.UpdateFriendsList();
              s.SendToSession(new MessengerUpdateReply(s));
         }
     }

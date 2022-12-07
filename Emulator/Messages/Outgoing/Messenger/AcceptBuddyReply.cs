@@ -14,12 +14,11 @@ namespace Emulator.Messages.Outgoing.Messenger
     {
 
         private int m_id;
-        private GameSession m_game_session;
-
-        public AcceptBuddyReply(int id, GameSession s)
+        
+        public AcceptBuddyReply(int id)
         {
             this.m_id = id;
-            this.m_game_session = s;
+       
         }
         public void compose(HabboResponse response)
         {
@@ -35,10 +34,7 @@ namespace Emulator.Messages.Outgoing.Messenger
             response.writeString(m_user.user_last_visited);
             response.writeString(m_user.user_figure);
 
-            DatabaseManager.saveFriendBuddy(m_game_session, m_user.user_id);
-            DatabaseManager.removeFriendRequest(m_game_session.returnUser.user_id, m_user.user_id);
-            DatabaseManager.removeFriendRequest(m_user.user_id, m_game_session.returnUser.user_id);
-
+            
 
 
         }

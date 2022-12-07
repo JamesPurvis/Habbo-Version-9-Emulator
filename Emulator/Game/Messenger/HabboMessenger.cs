@@ -41,5 +41,10 @@ namespace Emulator.Game.Messenger
                 m_session.SendToSession(new BuddyRequestReply(request.from_id, DatabaseManager.returnEntityById(request.from_id).user_name));
             }
         }
+
+        public void UpdateFriendsList()
+        {
+            m_friends = DatabaseManager.returnFriendsIDs(m_session.returnUser.user_id);
+        }
     }
 }

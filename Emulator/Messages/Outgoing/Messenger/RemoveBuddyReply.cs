@@ -13,7 +13,7 @@ namespace Emulator.Messages.Outgoing.Messenger
     public class RemoveBuddyReply : MessageComposer
     {
         private int m_user_id;
-        private GameSession m_session;
+
 
         public RemoveBuddyReply(int userid)
         {
