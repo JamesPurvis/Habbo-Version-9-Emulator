@@ -37,6 +37,7 @@ namespace Emulator.Messages.Outgoing.Messenger
 
             DatabaseManager.saveFriendBuddy(m_game_session, m_user.user_id);
             DatabaseManager.removeFriendRequest(m_game_session.returnUser.user_id, m_user.user_id);
+            DatabaseManager.removeFriendRequest(m_user.user_id, m_game_session.returnUser.user_id);
 
 
 

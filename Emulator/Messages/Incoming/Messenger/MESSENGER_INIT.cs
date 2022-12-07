@@ -14,6 +14,8 @@ namespace Emulator.Messages.Incoming.Messenger
         public void invokeEvent(HabboRequest r, GameSession s)
         {
             s.SendToSession(new MessengerInitReply(s));
+            s.return_messenger.SendLoginFriendRequests();
+        
         }
     }
 }

@@ -12,6 +12,7 @@ using NHibernate.Tool.hbm2ddl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -234,6 +235,41 @@ namespace Emulator.Game.Database
             }
         }
 
+        public static MessengerFriends return_friend_buddy(GameSession s, int id)
+        {
+            MessengerFriends m_friend;
+
+            
+            using (ISession m_session = openSession())
+            {
+                m_friend = m_session.QueryOver<MessengerFriends>().Where(x => x.user_id == s.returnUser.user_id).And(x => x.friend_id == id).SingleOrDefault();
+
+                //need to find out how to do or statement
+                if (m_friend == null)
+                {
+                    m_friend = m_session.QueryOver<MessengerFriends>().Where(x => x.user_id == id).And(x => x.friend_id == s.returnUser.user_id).SingleOrDefault();
+                }
+
+                m_session.Close();
+            }
+
+            return m_friend;
+        }
+        public static void removeFriendBuddy(GameSession s, int id)
+        {
+            using (ISession m_session = openSession())
+            {
+                MessengerFriends m_friend = return_friend_buddy(s, id);
+                m_session.Delete(m_friend);
+                m_session.Flush();
+                m_session.Close();
+            }
+
+            s.return_messenger.return_friends.Clear();
+            s.return_messenger.return_friends = returnFriendsIDs(s.returnUser.user_id);
+
+        }
+
         public static MessengerRequests return_friend_request(int from_id, int to_id)
         {
             MessengerRequests m_request;
@@ -241,6 +277,7 @@ namespace Emulator.Game.Database
             using (ISession m_session = openSession())
             {
                 m_request = m_session.QueryOver<MessengerRequests>().Where(x => x.from_id == from_id).And(x => x.to_id == to_id).SingleOrDefault();
+                m_session.Close();
             }
 
             return m_request;
@@ -248,11 +285,43 @@ namespace Emulator.Game.Database
 
         public static void removeFriendRequest(int from_id, int to_id)
         {
-            MessengerRequests m_instance = return_friend_request(from_id, to_id);
+            MessengerRequests m_to = return_friend_request(from_id, to_id);
 
             using (ISession m_session = openSession())
             {
-                m_session.Delete(m_instance);
+                m_session.Delete(m_to);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
+        public static IList<MessengerRequests> returnAllFriendRequests(int id)
+        {
+            IList<MessengerRequests> m_requests;
+
+            using (ISession m_session = openSession())
+            {
+                m_requests = m_session.QueryOver<MessengerRequests>().Where(x => x.to_id == id).List();
+
+                m_session.Flush();
+                m_session.Close();
+            }
+
+            return m_requests;
+        }
+
+        public static void removeAllFriendRequests(int to_id)
+        {
+
+            using (ISession m_session = openSession())
+            {
+                IList<MessengerRequests> m_requests = returnAllFriendRequests(to_id);
+
+                foreach (MessengerRequests request in m_requests)
+                {
+                    m_session.Delete(request);
+                }
+
                 m_session.Flush();
                 m_session.Close();
             }

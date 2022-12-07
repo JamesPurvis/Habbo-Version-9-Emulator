@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Emulator.Messages.Incoming.Messenger
 {
+    //TODO: When a messenger request is accepted the request isn't deleted for some reason.
     public class MESSENGER_ACCEPTBUDDY : MessageEvent
     {
         public void invokeEvent(HabboRequest r, GameSession s)
