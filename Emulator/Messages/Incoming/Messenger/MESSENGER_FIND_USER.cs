@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 
 namespace Emulator.Messages.Incoming.Messenger
 {
-    public class MESSENGERINIT : MessageEvent
+    public class MESSENGER_FIND_USER : MessageEvent
     {
         public void invokeEvent(HabboRequest r, GameSession s)
         {
-            s.SendToSession(new MessengerInitReply(s));
-         //   s.SendToSession(new BuddyListReply(s));
+            String m_user_name = r.popString();
+
+            s.SendToSession(new MemberInfoReply(m_user_name));
         }
     }
 }

@@ -27,29 +27,17 @@ namespace Emulator.Messages.Incoming.Login
                 
                if (Startup.return_environment().return_session_manager().checkIfConnected(m_username))
                {
-                   Logging.Logging.m_Logger.Debug("DISCONNECTED");
+                   Logging.Logging.m_Logger.Debug("User disconnected, multiple logins.");
                   Startup.return_environment().return_session_manager().returnGameSession(m_username).returnChannel.CloseAsync();
                   Startup.return_environment().return_session_manager().removeMapping(m_username);
                }
-               
-                
 
-                s.SendToSession(new LoginOkReply());
-                UserModel m_current_user = DatabaseManager.returnEntity(m_username, s);
+                UserModel m_current_user = DatabaseManager.returnEntity(m_username);
                 Startup.return_environment().return_session_manager().mapNewSession(m_username, s);
                 s.returnUser = m_current_user;
-                s.SendToSession(new UserObjectReply(m_current_user));
 
-                try
-                {
-                    m_current_user.user_last_visited = DateTime.Now;
-                    s.return_database_session.Save(m_current_user);
-                    s.return_database_session.Flush();
-                }
-                catch(Exception e)
-                {
-                    Logging.Logging.m_Logger.Error(e.Message);
-                }
+                s.SendToSession(new LoginOkReply());
+                
 
 
                 HabboMessenger m_messenger = new HabboMessenger(s);

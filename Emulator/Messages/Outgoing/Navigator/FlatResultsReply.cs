@@ -23,7 +23,7 @@ namespace Emulator.Messages.Outgoing.Navigator
         public void compose(HabboResponse response)
         {
             response.return_special = true;
-            IList<NavigatorPrivates> mRooms = DatabaseManager.returnRoomByOwner(m_username, m_session);
+            IList<NavigatorPrivates> mRooms = DatabaseManager.returnRoomByOwner(m_username);
 
             foreach(NavigatorPrivates room in mRooms)
             {

@@ -17,6 +17,7 @@ using Emulator.Utils;
 using Emulator.Messages.Outgoing.Global;
 using Emulator.Messages.Outgoing.Navigator;
 using Emulator.Messages.Incoming.Messenger;
+using Google.Protobuf.Reflection;
 
 namespace Emulator.Messages
 {
@@ -38,8 +39,13 @@ namespace Emulator.Messages
             m_packet_handlers[4] = new TRY_LOGIN();
             m_packet_handlers[150] = new NAVIGATE();
             m_packet_handlers[16] = new SUSERF();
-            m_packet_handlers[12] = new MESSENGERINIT();
-            m_packet_handlers[15] = new MESSENGERUPDATE();
+            m_packet_handlers[12] = new MESSENGER_INIT();
+            m_packet_handlers[15] = new MESSENGER_UPDATE();
+            m_packet_handlers[41] = new MESSENGER_FIND_USER();
+            m_packet_handlers[7] = new GET_INFO();
+            m_packet_handlers[36] = new MESSENGER_ASSIGN_PER_MSG();
+            m_packet_handlers[39] = new MESSENGER_REQUEST_BUDDY();
+            m_packet_handlers[37] = new MESSENGER_ACCEPTBUDDY();
 
         }
 

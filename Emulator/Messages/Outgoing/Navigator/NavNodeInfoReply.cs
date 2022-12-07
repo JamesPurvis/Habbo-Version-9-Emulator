@@ -23,7 +23,7 @@ namespace Emulator.Messages.Outgoing.Navigator
             m_category_id = category_id;
             m_show_full = show_full;
             m_session = s;
-            m_category = DatabaseManager.returnEntity(m_category_id, s);
+            m_category = DatabaseManager.returnEntity(m_category_id);
         }
 
         public void compose(HabboResponse response)

@@ -4,6 +4,7 @@ using Emulator.Network.Session;
 using Emulator.Network.Streams;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
+using MySqlX.XDevAPI.Common;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Dialect;
@@ -51,60 +52,212 @@ namespace Emulator.Game.Database
         }
 
 
-        public static UserModel returnEntity(String userName, GameSession s)
+        public static UserModel returnEntity(String userName)
         {
-            UserModel m_user = s.return_database_session.Query<UserModel>().Where(x => x.user_name == userName).FirstOrDefault();
+            UserModel m_user;
 
-            Console.WriteLine(m_user.user_name);
+            using (ISession m_session = openSession())
+            {
+               m_user = m_session.Query<UserModel>().Where(x => x.user_name == userName).FirstOrDefault();
+                m_session.Close();
+            }
+               
 
             return m_user;
 
         }
 
-        public static NavigatorCategory returnEntity(int category_id, GameSession s)
+        public static NavigatorCategory returnEntity(int category_id)
         {
-            NavigatorCategory m_category = s.return_database_session.Query<NavigatorCategory>().Where(x => x.category_id == category_id).FirstOrDefault();
+            NavigatorCategory m_category;
+            using (ISession m_session = openSession())
+            {
+                m_category = m_session.Query<NavigatorCategory>().Where(x => x.category_id == category_id).FirstOrDefault();
+                m_session.Close();
+            }
 
             return m_category;
         }
 
-        public static IList<NavigatorPrivates> returnRoomByOwner(String owner, GameSession s)
+        public static IList<NavigatorPrivates> returnRoomByOwner(String owner)
         {
-            return s.return_database_session.Query<NavigatorPrivates>().Where(x => x.room_owner == owner).ToList();
+            IList<NavigatorPrivates> m_list = null;
+
+            using (ISession m_session = openSession())
+            {
+                m_list = m_session.Query<NavigatorPrivates>().Where(x => x.room_owner == owner).ToList();
+
+                m_session.Close();
+            }
+
+            return m_list;
+            
 
         }
 
-        public static List<MessengerFriend> returnFriendsIDs(GameSession s)
+        public static List<MessengerFriend> returnFriendsIDs(int userid)
         {
-            //figure out how to do this in one query.
-
             List<MessengerFriend> m_friends = new List<MessengerFriend>();
 
-            IList<MessengerFriends> m_friends_query = s.return_database_session.QueryOver<MessengerFriends>().Where(x => x.user_id == s.returnUser.user_id).List<MessengerFriends>();
-
-            IList<MessengerFriends> m_friends_query2 = s.return_database_session.QueryOver<MessengerFriends>().Where(x => x.friend_id == s.returnUser.user_id).List<MessengerFriends>();
-
-
-
-
-
-            foreach (MessengerFriends f in m_friends_query)
+            using (ISession m_session = openSession())
             {
-                m_friends.Add(new MessengerFriend(f.friend_id, s));
-                
+
+                IList<MessengerFriends> m_friends_query = m_session.QueryOver<MessengerFriends>().Where(x => x.user_id == userid).List<MessengerFriends>();
+
+                IList<MessengerFriends> m_friends_query2 = m_session.QueryOver<MessengerFriends>().Where(x => x.friend_id == userid).List<MessengerFriends>();
+
+
+
+
+                foreach (MessengerFriends f in m_friends_query)
+                {
+                    m_friends.Add(new MessengerFriend(f.friend_id));
+
+                }
+
+                foreach (MessengerFriends g in m_friends_query2)
+                {
+                    m_friends.Add(new MessengerFriend(g.user_id));
+                }
+
+                m_session.Close();
+
             }
 
-            foreach(MessengerFriends g in m_friends_query2)
-            {
-                m_friends.Add(new MessengerFriend(g.user_id, s));
-            }
 
             return m_friends;
         }
 
-        public static UserModel returnEntityById(int id, GameSession s)
+        public static UserModel returnEntityById(int id)
         {
-            return s.return_database_session.Query<UserModel>().Where(x => x.user_id == id).FirstOrDefault();
+            UserModel m_model;
+
+            using (ISession m_session = DatabaseManager.openSession())
+            {
+                m_model = m_session.Query<UserModel>().Where(x => x.user_id == id).FirstOrDefault();
+                m_session.Close();
+            }
+
+            return m_model;
+                
         }
+        public static UserModel returnEntityByName(string name)
+        {
+            UserModel m_model;
+
+            using (ISession m_session = DatabaseManager.openSession())
+            {
+                m_model = m_session.Query<UserModel>().Where(x => x.user_name == name).FirstOrDefault();
+                m_session.Close();
+            }
+
+            return m_model;
+
+        }
+        public static Boolean checkIfUserExists(String name)
+        {
+            Boolean result;
+
+            using (ISession m_session = DatabaseManager.openSession())
+            {
+                result = m_session.QueryOver<UserModel>().Where(x => x.user_name == name).RowCount() > 0;
+                m_session.Close();
+            }
+
+            return result;
+        }
+
+        public static void updatePersistentMessage(String name, String mission)
+        {
+            UserModel m_user = returnEntityByName(name);
+
+            using (ISession m_session = DatabaseManager.openSession())
+            {
+                m_user.user_console_mission = mission;
+                m_session.Update(m_user);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
+        public static void createNewFriendRequest(GameSession s, int id)
+        {
+            using (ISession m_session = DatabaseManager.openSession())
+            {
+                MessengerRequests m_request = new MessengerRequests();
+                m_request.to_id = id;
+                m_request.from_id = s.returnUser.user_id;
+
+                m_session.Save(m_request);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
+        public static Boolean FriendRequestsExists(int toId, int fromId)
+        {
+            Boolean m_result;
+
+            using (ISession m_session = DatabaseManager.openSession())
+            {
+                m_result = m_session.QueryOver<MessengerRequests>().Where(x => x.to_id == toId).And(x => x.from_id == fromId).RowCount() > 0;
+                m_session.Close();
+            }
+
+            return m_result;
+        }
+
+        public static int returnUserIdByName(String name)
+        {
+            UserModel m_model;
+
+            using (ISession m_session = DatabaseManager.openSession())
+            {
+                m_model = m_session.Query<UserModel>().Where(x => x.user_name == name).FirstOrDefault();
+                m_session.Close();
+            }
+
+            return m_model.user_id;
+
+        }
+
+        public static void saveFriendBuddy(GameSession s, int id)
+        {
+            using (ISession m_session = openSession())
+            {
+                MessengerFriends m_friend = new MessengerFriends();
+                m_friend.user_id = s.returnUser.user_id;
+                m_friend.friend_id = id;
+                m_session.Save(m_friend);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
+        public static MessengerRequests return_friend_request(int from_id, int to_id)
+        {
+            MessengerRequests m_request;
+
+            using (ISession m_session = openSession())
+            {
+                m_request = m_session.QueryOver<MessengerRequests>().Where(x => x.from_id == from_id).And(x => x.to_id == to_id).SingleOrDefault();
+            }
+
+            return m_request;
+        }
+
+        public static void removeFriendRequest(int from_id, int to_id)
+        {
+            MessengerRequests m_instance = return_friend_request(from_id, to_id);
+
+            using (ISession m_session = openSession())
+            {
+                m_session.Delete(m_instance);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
+
     }
 }

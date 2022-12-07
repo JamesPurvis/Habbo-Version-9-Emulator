@@ -21,7 +21,7 @@ namespace Emulator.Game.Messenger
         {
             m_session = s;
             m_session.return_messenger = this;
-            m_friends = DatabaseManager.returnFriendsIDs(s);
+            m_friends = DatabaseManager.returnFriendsIDs(m_session.returnUser.user_id);
         }
     }
 }

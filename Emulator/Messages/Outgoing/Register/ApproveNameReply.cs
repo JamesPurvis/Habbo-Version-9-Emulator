@@ -1,4 +1,5 @@
-﻿using Emulator.Game.Models;
+﻿using Emulator.Game.Database;
+using Emulator.Game.Models;
 using Emulator.Network.Session;
 using Emulator.Network.Streams;
 using Org.BouncyCastle.Crypto.Tls;
@@ -22,7 +23,7 @@ namespace Emulator.Messages.Outgoing.Register
         }
         public void compose(HabboResponse response)
         {
-            if (!UserModel.checkIfUserExists(m_input_name, m_session))
+            if (!DatabaseManager.checkIfUserExists(m_input_name))
             {
                 response.writeInt(0);
             }

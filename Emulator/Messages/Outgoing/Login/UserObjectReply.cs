@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Emulator.Game.Models;
+using NHibernate;
+using Emulator.Game.Database;
 
 namespace Emulator.Messages.Outgoing.Login
 {
@@ -17,18 +19,30 @@ namespace Emulator.Messages.Outgoing.Login
         }
         public void compose(HabboResponse response)
         {
-            //USER OBJECT on version 9 uses the old packet structure? Why was it not updated. This will work for now.
-            StringBuilder mGetInfo = new StringBuilder();
-            mGetInfo.Append("name=" + m_user.user_name + Convert.ToChar(13));
-            mGetInfo.Append("figure=" + m_user.user_figure + Convert.ToChar(13));
-            mGetInfo.Append("sex=" + m_user.user_gender.ToString() + Convert.ToChar(13));
-            mGetInfo.Append("customData=" + m_user.user_mission + Convert.ToChar(13));
-            mGetInfo.Append("ph_tickets=" + 0 + Convert.ToChar(13));
-            mGetInfo.Append("photo_film=" + 0  + Convert.ToChar(13));
-            mGetInfo.Append("ph_figure=" + "" + Convert.ToChar(13));
-            mGetInfo.Append("directmail=0" + Convert.ToChar(13));
+            response.write("name=" + m_user.user_name + Convert.ToChar(13));
+            response.write("figure=" + m_user.user_figure + Convert.ToChar(13));
+            response.write("sex=" + m_user.user_gender.ToString() + Convert.ToChar(13));
+            response.write("customData=" + m_user.user_mission + Convert.ToChar(13));
+            response.write("ph_tickets=" + 0 + Convert.ToChar(13));
+            response.write("photo_film=" + 0  + Convert.ToChar(13));
+            response.write("ph_figure=" + "" + Convert.ToChar(13));
+            response.write("directmail=0" + Convert.ToChar(13));
 
-            response.write(mGetInfo.ToString());
+            try
+            {
+                m_user.user_last_visited = DateTime.Now;
+
+                using (ISession m_session = DatabaseManager.openSession())
+                {
+                    m_session.Update(m_user);
+                    m_session.Flush();
+                    m_session.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.Logging.m_Logger.Error(e.Message);
+            }
         }
 
         public short return_header_id()

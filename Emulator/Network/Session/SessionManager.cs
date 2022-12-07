@@ -24,7 +24,7 @@ namespace Emulator.Network.Session
 
         public GameSession returnGameSession(String user_name )
         {
-            return m_active_clients[user_name];
+            return m_active_clients[user_name.ToLower()];
         }
 
         public void removeMapping(String user_name)

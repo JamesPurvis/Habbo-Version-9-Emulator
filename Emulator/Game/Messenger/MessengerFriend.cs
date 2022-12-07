@@ -66,9 +66,9 @@ namespace Emulator.Game.Messenger
             }
         }
 
-        public MessengerFriend(int id, GameSession s)
+        public MessengerFriend(int id)
         {
-            user_model = DatabaseManager.returnEntityById(id, s);
+            user_model = DatabaseManager.returnEntityById(id);
             user_id = id;
             user_name = user_model.user_name;
             console_status = user_model.user_console_mission;

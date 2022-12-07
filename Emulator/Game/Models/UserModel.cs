@@ -1,4 +1,6 @@
-﻿using Emulator.Network.Session;
+﻿using Emulator.Game.Database;
+using Emulator.Network.Session;
+using MySqlX.XDevAPI.Common;
 using NHibernate;
 using System;
 
@@ -30,11 +32,6 @@ namespace Emulator.Game.Models
 
         public virtual DateTime user_last_visited { get; set; }
 
-        public static Boolean checkIfUserExists(String name, GameSession s)
-        {
-
-           return s.return_database_session.QueryOver<UserModel>().Where(x => x.user_name == name).RowCount() > 0;
-        }
 
 
     }
