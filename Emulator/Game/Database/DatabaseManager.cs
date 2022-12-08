@@ -28,7 +28,7 @@ namespace Emulator.Game.Database
             try
             {
                 m_session_factory = Fluently.Configure()
-               .Database(MySQLConfiguration.Standard.ConnectionString("Server=localhost;Database=habboserver;Uid=root;Pwd=;").ShowSql())
+               .Database(MySQLConfiguration.Standard.ConnectionString("Server=localhost;Database=habboserver;Uid=root;Pwd=;"))
               .Mappings(m => m.FluentMappings
              .AddFromAssemblyOf<Environment>())
              .ExposeConfiguration(cfg => new SchemaUpdate(cfg).Execute(true, true))
@@ -303,7 +303,6 @@ namespace Emulator.Game.Database
             {
                 m_requests = m_session.QueryOver<MessengerRequests>().Where(x => x.to_id == id).List();
 
-                m_session.Flush();
                 m_session.Close();
             }
 
@@ -327,6 +326,51 @@ namespace Emulator.Game.Database
             }
         }
 
+        public static MessengerMessages createNewMessage(int recepient_id, int sender_id, string msg, DateTime time)
+        {
+            MessengerMessages m_message;
+
+            using (ISession m_session = openSession())
+            {
+                m_message = new MessengerMessages();
+
+                m_message.sender_id = sender_id;
+                m_message.recepient_id = recepient_id;
+                m_message.message_text = msg;
+                m_message.time_sent = DateTime.Now;
+                m_session.Save(m_message);
+
+                m_session.Flush();
+                m_session.Close();
+            }
+
+            return m_message;
+        }
+
+        public static void markMessageAsRead(int id)
+        {
+            using (ISession m_session = openSession())
+            {
+                MessengerMessages m_message = m_session.QueryOver<MessengerMessages>().Where(x => x.message_id == id).SingleOrDefault();
+                m_session.Delete(m_message);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
+        public static IList<MessengerMessages> returnAllMessages(int id)
+        {
+            IList<MessengerMessages> m_messages;
+
+            using (ISession m_session = openSession())
+            {
+                m_messages = m_session.QueryOver<MessengerMessages>().Where(x => x.recepient_id == id).List();
+                m_session.Close();
+            }
+
+            return m_messages;
+
+        }
 
     }
 }

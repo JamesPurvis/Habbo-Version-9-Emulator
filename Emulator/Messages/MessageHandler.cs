@@ -49,6 +49,7 @@ namespace Emulator.Messages
             m_packet_handlers[40] = new MESSENGER_REMOVE_BUDDY();
             m_packet_handlers[38] = new MESSENGER_DECLINE_BUDDY();
             m_packet_handlers[33] = new MESSENGER_SEND_MSG();
+            m_packet_handlers[32] = new MESSENGER_MARKREAD();
 
         }
 

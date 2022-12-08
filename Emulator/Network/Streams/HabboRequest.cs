@@ -14,42 +14,52 @@ namespace Emulator.Network.Streams
 
     public class HabboRequest
     {
-        private int m_header_id;
-        private string m_header;
+        private byte[] m_header;
         private IByteBuffer m_packet_buffer;
+        private int m_length;
 
-        public String return_header()
+        public byte[] return_header_byte()
         {
             return m_header;
         }
 
         public int return_header_id()
         {
-            return m_header_id;
+            return Base64Encoding.decode(m_header);
         }
 
-        public HabboRequest(IByteBuffer buff)
+        public string return_header_string()
+        {
+            return Encoding.GetEncoding("ISO-8859-1").GetString(m_header);
+        }
+
+        public int return_length()
+        {
+            return m_length;
+        }
+
+        public HabboRequest(IByteBuffer buff, int m_length)
         {
             this.m_packet_buffer = buff;
-            byte[] m_header_array = new byte[] { buff.ReadByte(), buff.ReadByte() };
-            m_header =  Encoding.GetEncoding("ISO-8859-1").GetString(m_header_array);
-            m_header_id = Utils.Base64Encoding.decode(m_header_array);
+            this.m_header = new byte[] { buff.ReadByte(), buff.ReadByte() };
+            this.m_length = m_length;
 
-            Logging.Logging.m_Logger.Debug(m_header_id);
-            Logging.Logging.m_Logger.Debug("Received: " + toString() );
+            Logging.Logging.m_Logger.Info("PACKET with length: " + m_length + " " + "[" + " " + "STRING: " + " " + return_header_string() + " " + "INT: " + " " + return_header_id() + "] ");
+            Logging.Logging.m_Logger.Info(toString());
 
         }
 
         public int readBase64()
         {
-            return Utils.Base64Encoding.decode(new byte[] { this.m_packet_buffer.ReadByte(), this.m_packet_buffer.ReadByte() });
+            byte[] m_base_64 = new byte[] { this.m_packet_buffer.ReadByte(), this.m_packet_buffer.ReadByte() };
+            Console.WriteLine(Encoding.GetEncoding("ISO-8859-1").GetString(m_base_64));
+            return Base64Encoding.decode(m_base_64);
         }
 
         public String popString()
         {
-            int m_length = this.readBase64();
+            int m_length = readBase64();
             byte[] m_data = this.readBytes(m_length);
-
             return Encoding.GetEncoding("ISO-8859-1").GetString(m_data);
         }
         public string toString()

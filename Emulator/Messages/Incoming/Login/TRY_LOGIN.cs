@@ -37,7 +37,7 @@ namespace Emulator.Messages.Incoming.Login
                 s.returnUser = m_current_user;
 
                 s.SendToSession(new LoginOkReply());
-                
+                s.SendToSession(new CampaignMessageReply());
 
 
                 HabboMessenger m_messenger = new HabboMessenger(s);

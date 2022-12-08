@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
+using Emulator.Messages.Incoming.Messenger;
 using Emulator.Network.Session;
 using Emulator.Network.Streams;
 
@@ -26,6 +27,7 @@ namespace Emulator.Network.Codecs
 
             int m_packet_length = Emulator.Utils.Base64Encoding.decode(new byte[] {input.ReadByte(), input.ReadByte(), input.ReadByte()});
 
+
            if (input.ReadableBytes < m_packet_length)
             {
                 input.ResetReaderIndex();
@@ -37,7 +39,7 @@ namespace Emulator.Network.Codecs
                 return;
             }
 
-            HabboRequest m_request = new HabboRequest(input.ReadBytes(m_packet_length));
+            HabboRequest m_request = new HabboRequest(input.ReadBytes(m_packet_length), m_packet_length);
 
             if (m_session == null)
             {

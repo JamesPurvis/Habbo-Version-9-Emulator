@@ -15,7 +15,7 @@ namespace Emulator.Game.Messenger
         private GameSession m_session;
         private List<MessengerFriend> m_friends;
         private IList<MessengerRequests> m_requests;
-
+        private IList<MessengerMessages> m_messages;
          public List<MessengerFriend> return_friends
         {
             get { return m_friends; }
@@ -26,12 +26,18 @@ namespace Emulator.Game.Messenger
         {
             get { return m_requests;  }
         }
+
+        public IList<MessengerMessages> return_messages
+        {
+            get { return m_messages; }
+        }
         public HabboMessenger(GameSession s)
         {
             m_session = s;
             m_session.return_messenger = this;
             m_friends = DatabaseManager.returnFriendsIDs(m_session.returnUser.user_id);
             m_requests = DatabaseManager.returnAllFriendRequests(m_session.returnUser.user_id);
+            m_messages = DatabaseManager.returnAllMessages(s.returnUser.user_id);
         }
 
         public void SendLoginFriendRequests()
@@ -45,6 +51,14 @@ namespace Emulator.Game.Messenger
         public void UpdateFriendsList()
         {
             m_friends = DatabaseManager.returnFriendsIDs(m_session.returnUser.user_id);
+        }
+
+        public void SendLoginMessages()
+        {
+            foreach(MessengerMessages message in m_messages)
+            {
+                m_session.SendToSession(new MessengerMessagesReply(message.message_id, message.sender_id, message.time_sent, message.message_text));
+            }
         }
     }
 }
