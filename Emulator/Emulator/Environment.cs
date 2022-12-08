@@ -31,7 +31,7 @@ public class Environment
        Logging.m_Logger.Info("A server environment has been intialized successfully.");
         m_server_bootstrap = new ServerBootStrap();
         Logging.m_Logger.Info("A server bootstrap has been intialized successfully.");
-        m_server_bootstrap.beginListening("127.0.0.1", 1232);
+        m_server_bootstrap.beginListening("10.0.0.23", 30000);
         m_message_handler = new MessageHandler();
         m_database_manager = new DatabaseManager();
         m_session_manager = new SessionManager();

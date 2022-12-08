@@ -50,6 +50,9 @@ namespace Emulator.Messages
             m_packet_handlers[38] = new MESSENGER_DECLINE_BUDDY();
             m_packet_handlers[33] = new MESSENGER_SEND_MSG();
             m_packet_handlers[32] = new MESSENGER_MARKREAD();
+            m_packet_handlers[151] = new GETUSERFLATCATS();
+            m_packet_handlers[29] = new CREATEFLAT();
+            m_packet_handlers[25] = new SETFLATINFO();
 
         }
 

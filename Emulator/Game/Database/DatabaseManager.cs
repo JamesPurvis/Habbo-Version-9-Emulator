@@ -372,5 +372,18 @@ namespace Emulator.Game.Database
 
         }
 
+        public static IList<NavigatorCategory> return_user_flat_cats()
+        {
+            IList<NavigatorCategory> m_user_flat_cats;
+
+            using (ISession m_session = openSession())
+            {
+                m_user_flat_cats = m_session.QueryOver<NavigatorCategory>().Where(x => x.category_type == 2).List();
+                m_session.Close();
+            }
+
+            return m_user_flat_cats;
+        }
+
     }
 }
