@@ -12,42 +12,39 @@ namespace Emulator.Messages.Outgoing.Navigator
 {
     public class FlatResultsReply : MessageComposer
     {
-        private GameSession m_session = null;
-        private String m_username = null;
+        private IList<NavigatorPrivates> m_room_list;
 
-        public FlatResultsReply(GameSession s, String username)
+        public FlatResultsReply(IList<NavigatorPrivates> m_room_list)
         {
-            m_session = s;
-            m_username = username;
+            this.m_room_list = m_room_list;
         }
         public void compose(HabboResponse response)
         {
-            response.return_special = true;
-            IList<NavigatorPrivates> mRooms = DatabaseManager.returnRoomByOwner(m_username);
 
-            foreach(NavigatorPrivates room in mRooms)
+            foreach (NavigatorPrivates room in m_room_list)
             {
                 response.writeInt(room.room_id);
                 response.write((char)9);
-                response.writeString(room.room_name);
+                response.write(room.room_name);
                 response.write((char)9);
-                response.writeString(room.room_owner);
+                response.write(room.room_owner);
                 response.write((char)9);
-                response.writeString(room.room_status);
+                response.write(room.room_status);
                 response.write((char)9);
-                response.writeString("x");
+                response.write("x");
                 response.write((char)9);
-                response.writeString(room.room_visitors);
+                response.write(room.room_visitors);
                 response.write((char)9);
-                response.writeString(room.room_max_visitors);
+                response.write(room.room_max_visitors);
                 response.write((char)9);
-                response.writeString("null");
+                response.write("null");
                 response.write((char)9);
                 response.write(room.room_description);
                 response.write((char)9);
                 response.write((char)13);
 
             }
+
         }
 
         public short return_header_id()

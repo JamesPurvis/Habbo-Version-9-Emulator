@@ -17,13 +17,7 @@ namespace Emulator.Network.Streams
 
         private short m_header_id;
         private IByteBuffer m_byte_buffer;
-        private Boolean m_special = false;
 
-        public Boolean return_special
-        {
-            get { return m_special;  }
-            set { m_special = value; }
-        }
         public HabboResponse(short id, IByteBuffer buff)
         {
             this.m_header_id = id;
@@ -47,10 +41,8 @@ namespace Emulator.Network.Streams
                 this.m_byte_buffer.WriteBytes(Encoding.GetEncoding("ISO-8859-1").GetBytes(obj.ToString()));
             }
 
-            if (m_special == false)
-            {
                 this.m_byte_buffer.WriteByte(2);
-            }
+            
         }
 
         public void writeInt(int number)

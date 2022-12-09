@@ -60,5 +60,12 @@ namespace Emulator.Utils
 
             return v;
         }
+
+        public int decodeString(string str)
+        {
+            byte[] m_array = Encoding.GetEncoding("ISO-8859-1").GetBytes(str);
+
+            return decode(m_array);
+        }
     }
 }

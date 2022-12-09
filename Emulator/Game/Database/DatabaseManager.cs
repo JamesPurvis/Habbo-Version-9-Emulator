@@ -385,5 +385,47 @@ namespace Emulator.Game.Database
             return m_user_flat_cats;
         }
 
+
+        public static int createNewRoom(string name, string model, string status, int showowner)
+        {
+            NavigatorPrivates m_new_room = new NavigatorPrivates();
+
+            using (ISession m_session = openSession())
+            {
+                m_new_room.room_name = name;
+                m_new_room.room_model = model;
+                m_new_room.room_status = status;
+                m_new_room.show_owner = (showowner == 1);
+
+                m_session.Save(m_new_room);
+                m_session.Flush();
+                m_session.Close();
+            }
+
+            return m_new_room.room_id;
+        }
+
+        public static NavigatorPrivates return_user_room(int id)
+        {
+            NavigatorPrivates m_room;
+
+            using (ISession m_session = openSession())
+            {
+                m_room = m_session.QueryOver<NavigatorPrivates>().Where(x => x.room_id == id).SingleOrDefault();
+                m_session.Close();
+            }
+
+            return m_room;
+        }
+        public static void UpdateUserRoom(NavigatorPrivates room)
+        { 
+            using (ISession m_session = openSession())
+            {
+                m_session.Update(room);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
     }
 }

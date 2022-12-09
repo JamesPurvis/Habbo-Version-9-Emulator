@@ -1,4 +1,6 @@
-﻿using Emulator.Messages.Outgoing.Navigator;
+﻿using Emulator.Game.Database;
+using Emulator.Game.Models;
+using Emulator.Messages.Outgoing.Navigator;
 using Emulator.Network.Session;
 using Emulator.Network.Streams;
 using System;
@@ -13,8 +15,16 @@ namespace Emulator.Messages.Incoming.Navigator
     {
         public void invokeEvent(HabboRequest r, GameSession s)
         {
-            String m_userName = s.returnUser.user_name;
-            s.SendToSession(new FlatResultsReply(s, m_userName));
+            IList<NavigatorPrivates> m_room_list = DatabaseManager.returnRoomByOwner(s.returnUser.user_name);
+
+            if (m_room_list.Count > 0)
+            {
+                s.SendToSession(new FlatResultsReply(m_room_list));
+            }
+            else
+            {
+                s.SendToSession(new NoFlatsForUser());
+            }
         }
     }
 }

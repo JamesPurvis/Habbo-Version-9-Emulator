@@ -1,4 +1,5 @@
-﻿using Emulator.Messages.Outgoing.Navigator;
+﻿using Emulator.Game.Database;
+using Emulator.Messages.Outgoing.Navigator;
 using Emulator.Network.Session;
 using Emulator.Network.Streams;
 using NHibernate.Util;
@@ -15,8 +16,7 @@ namespace Emulator.Messages.Incoming.Navigator
         public void invokeEvent(HabboRequest r, GameSession s)
         {
             String m_create_string = r.toString();
-
-            LinkedHashMap<int, string> m_props = Utils.RoomPacketParser.returnRoomProperties(m_create_string);
+            String[] m_props = m_create_string.Split('/');
 
             String m_room_category = m_props[1];
             String m_room_name = m_props[2];
@@ -24,9 +24,11 @@ namespace Emulator.Messages.Incoming.Navigator
             String m_room_status = m_props[4];
             int m_room_show_owner = int.Parse(m_props[5]);
 
+
+
            
 
-            s.SendToSession(new FlatCreatedReply(1, m_room_name));
+            s.SendToSession(new FlatCreatedReply(DatabaseManager.createNewRoom(m_room_name, m_room_model, m_room_status, m_room_show_owner), m_room_name));
         }
     }
 }
