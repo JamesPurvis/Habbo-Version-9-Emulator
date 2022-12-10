@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NHibernate.Linq.ReWriters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,11 +62,18 @@ namespace Emulator.Utils
             return v;
         }
 
-        public int decodeString(string str)
+        public static int decodeString(string str)
         {
             byte[] m_array = Encoding.GetEncoding("ISO-8859-1").GetBytes(str);
 
             return decode(m_array);
+        }
+
+       public static string encodeString(int value)
+        {
+            byte[] m_array = encode(value);
+
+            return Encoding.GetEncoding("ISO-8859-1").GetString(m_array);
         }
     }
 }

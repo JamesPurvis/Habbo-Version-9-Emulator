@@ -54,6 +54,13 @@ namespace Emulator.Messages
             m_packet_handlers[29] = new CREATEFLAT();
             m_packet_handlers[25] = new SETFLATINFO();
             m_packet_handlers[153] = new SETFLATCAT();
+            m_packet_handlers[17] = new SRCHF();
+            m_packet_handlers[19] = new ADD_FAVORITE_ROOM();
+            m_packet_handlers[20] = new DELETE_FAVORITE_ROOM();
+            m_packet_handlers[18] = new GETFVRF();
+            m_packet_handlers[21] = new GETFLATINFO();
+            m_packet_handlers[152] = new GETFLATCAT();
+            m_packet_handlers[24] = new UPDATEFLAT();
 
         }
 

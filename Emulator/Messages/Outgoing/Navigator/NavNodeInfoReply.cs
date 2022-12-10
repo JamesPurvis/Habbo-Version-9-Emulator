@@ -91,7 +91,7 @@ namespace Emulator.Messages.Outgoing.Navigator
 
             foreach (NavigatorPublics child in m_category.return_child_rooms())
             {
-                response.writeInt(child.room_id);
+                response.writeInt(child.room_id + 1000);
                 response.writeInt(1);
                 response.writeString(child.room_name);
                 response.writeInt(child.room_current_visitors);
