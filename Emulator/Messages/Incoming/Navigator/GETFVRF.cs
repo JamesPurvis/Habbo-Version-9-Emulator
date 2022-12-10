@@ -4,6 +4,7 @@ using Emulator.Messages.Outgoing.Navigator;
 using Emulator.Network.Session;
 using Emulator.Network.Streams;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,20 +12,12 @@ using System.Threading.Tasks;
 
 namespace Emulator.Messages.Incoming.Navigator
 {
-    public class SUSERF : MessageEvent
+    public class GETFVRF : MessageEvent
     {
         public void invokeEvent(HabboRequest r, GameSession s)
         {
-            IList<NavigatorPrivates> m_room_list = DatabaseManager.returnRoomByOwner(s.returnUser.user_name);
-
-            if (m_room_list.Count > 0)
-            {
-                s.SendToSession(new FlatResultsReply(m_room_list));
-            }
-            else
-            {
-                s.SendToSession(new NoFlatsForUser());
-            }
+            IList<NavigatorFavorites> m_favorites = DatabaseManager.returnAllFavoriteRooms(s.returnUser.user_id);
+            s.SendToSession(new FavoriteRoomResults(s,m_favorites));
         }
     }
 }

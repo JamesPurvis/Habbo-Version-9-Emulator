@@ -4,12 +4,16 @@ using Emulator.Network.Session;
 using Emulator.Network.Streams;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
+using FluentNHibernate.Conventions;
 using MySqlX.XDevAPI.Common;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Dialect;
 using NHibernate.Tool.hbm2ddl;
+using NHibernate.Transform;
+using Org.BouncyCastle.Asn1.Mozilla;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -385,5 +389,154 @@ namespace Emulator.Game.Database
             return m_user_flat_cats;
         }
 
+
+        public static int createNewRoom(string name, string model, string status, int showowner)
+        {
+            NavigatorPrivates m_new_room = new NavigatorPrivates();
+
+            using (ISession m_session = openSession())
+            {
+                m_new_room.room_name = name;
+                m_new_room.room_model = model;
+                m_new_room.room_status = status;
+                m_new_room.show_owner = (showowner == 1);
+
+                m_session.Save(m_new_room);
+                m_session.Flush();
+                m_session.Close();
+            }
+
+            return m_new_room.room_id;
+        }
+
+        public static NavigatorPrivates return_user_room(int id)
+        {
+            NavigatorPrivates m_room;
+
+            using (ISession m_session = openSession())
+            {
+                m_room = m_session.QueryOver<NavigatorPrivates>().Where(x => x.room_id == id).SingleOrDefault();
+                m_session.Close();
+            }
+
+            return m_room;
+        }
+        public static void UpdateUserRoom(NavigatorPrivates room)
+        { 
+            using (ISession m_session = openSession())
+            {
+                m_session.Update(room);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
+        public static IList<NavigatorPrivates> searchForRooms(String query)
+        {
+            string m_owner_name = query.Replace("%", "");
+            Console.WriteLine("This is query: " + query);
+            IList<NavigatorPrivates> m_search_result;
+
+            using (ISession m_session = openSession())
+            {
+               // if (String.IsNullOrEmpty(query.Replace("%","")))
+               // {
+               //     m_search_result = m_session.CreateSQLQuery("SELECT * FROM navigator_privates ORDER BY room_id ASC, LIMIT 10").SetResultTransformer((Transformers.AliasToBean<NavigatorPrivates>())).List<NavigatorPrivates>().ToList();
+               // }
+               // else
+              //  {
+                    m_search_result = m_session.CreateSQLQuery("SELECT * FROM navigator_privates WHERE room_name LIKE :query OR room_owner = :query2").SetParameter("query", query).SetParameter("query2", m_owner_name).SetResultTransformer((Transformers.AliasToBean<NavigatorPrivates>())).List<NavigatorPrivates>().ToList();
+                //}
+
+                m_session.Close();
+            }
+
+            return m_search_result;
+        }
+
+        public static NavigatorFavorites returnFavoriteRoom(int room_id, int type, int user_id)
+        {
+            NavigatorFavorites m_instance;
+
+            using (ISession m_session = openSession())
+            {
+                m_instance = m_session.QueryOver<NavigatorFavorites>().Where(x => x.room_id == room_id).And(x => x.room_type == type).And(x => x.owner_id == user_id).SingleOrDefault();
+                m_session.Close();
+            }
+
+            return m_instance;
+        }
+
+        public static IList<NavigatorFavorites> returnAllFavoriteRooms(int owner_id)
+        {
+            IList<NavigatorFavorites> m_favorites;
+
+            using (ISession m_session = openSession())
+            {
+                m_favorites = m_session.QueryOver<NavigatorFavorites>().Where(x => x.owner_id == owner_id).List();
+                m_session.Close();
+            }
+
+            return m_favorites;
+        }
+
+        public static object returnFavoriteRoomInstance(int room_id, int type)
+        {
+            object m_instance;
+
+            using(ISession m_session = openSession())
+            {
+                if (type == 1)
+                {
+                    m_instance = m_session.Query<NavigatorPublics>().Where(x => x.room_id == room_id).SingleOrDefault();
+                }
+                else
+                {
+                    m_instance = m_session.Query<NavigatorPrivates>().Where(x => x.room_id == room_id).SingleOrDefault();
+                }
+
+                m_session.Close();
+            }
+
+            return m_instance;
+        }
+
+        public static void addFavoriteRoom(int room_type, int room_id, int user_id)
+        {
+            NavigatorFavorites m_new_favorite = new NavigatorFavorites();
+
+            using (ISession m_session = openSession())
+            {
+                m_new_favorite.room_id = room_id;
+                m_new_favorite.room_type = room_type;
+                m_new_favorite.owner_id = user_id;
+
+                m_session.Save(m_new_favorite);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
+        public static void deleteFavoriteRoom(NavigatorFavorites instance)
+        {
+            using (ISession m_session = openSession())
+            {
+                m_session.Delete(instance);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
+        public static int return_guest_count_favorite(int user_id)
+        {
+            int m_count;
+
+            using (ISession m_session = openSession())
+            {
+                m_count = m_session.QueryOver<NavigatorFavorites>().Where(x => x.room_type == 0).RowCount();
+            }
+
+            return m_count;
+        }
     }
 }

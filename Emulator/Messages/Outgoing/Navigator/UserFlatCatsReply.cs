@@ -16,11 +16,16 @@ namespace Emulator.Messages.Outgoing.Navigator
            IList<NavigatorCategory> m_flat_cats = DatabaseManager.return_user_flat_cats();
             
             response.writeInt(m_flat_cats.Count);
+            response.writeInt(0);
+            response.writeString("No category");
 
             foreach(NavigatorCategory category in m_flat_cats)
             {
-                response.writeInt(category.category_id);
-                response.writeString(category.category_name);
+                if (category.category_parent_id != 0)
+                {
+                    response.writeInt(category.category_id);
+                    response.writeString(category.category_name);
+                }
             }
         }
 

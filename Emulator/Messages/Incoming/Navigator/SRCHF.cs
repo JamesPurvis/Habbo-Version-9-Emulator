@@ -4,26 +4,30 @@ using Emulator.Messages.Outgoing.Navigator;
 using Emulator.Network.Session;
 using Emulator.Network.Streams;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Emulator.Messages.Incoming.Navigator
 {
-    public class SUSERF : MessageEvent
+    public class SRCHF : MessageEvent
     {
         public void invokeEvent(HabboRequest r, GameSession s)
         {
-            IList<NavigatorPrivates> m_room_list = DatabaseManager.returnRoomByOwner(s.returnUser.user_name);
+            string m_search_term = r.return_body();
 
-            if (m_room_list.Count > 0)
+            IList<NavigatorPrivates> m_search_result = DatabaseManager.searchForRooms(m_search_term);
+
+            if (m_search_result.Count > 0)
             {
-                s.SendToSession(new FlatResultsReply(m_room_list));
+                s.SendToSession(new FlatResultsSrcReply(m_search_result));
             }
             else
             {
-                s.SendToSession(new NoFlatsForUser());
+                s.SendToSession(new NoFlatsReply());
             }
         }
     }

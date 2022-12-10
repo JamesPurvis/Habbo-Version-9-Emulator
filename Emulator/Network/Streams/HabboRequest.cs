@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DotNetty.Buffers;
 using Emulator.Network.Session;
 using Emulator.Utils;
+using NHibernate.Linq.Clauses;
 
 namespace Emulator.Network.Streams
 {
@@ -95,6 +96,18 @@ namespace Emulator.Network.Streams
             byte[] m_payload = new byte[length];
             this.m_packet_buffer.ReadBytes(m_payload);
             return m_payload;
+        }
+
+        public string return_body()
+        {
+            byte[] remainingBytes = this.remainingBytes();
+
+            if (remainingBytes != null)
+            {
+                return Encoding.GetEncoding("ISO-8859-1").GetString(remainingBytes);
+            }
+
+            return null;
         }
     }
 }

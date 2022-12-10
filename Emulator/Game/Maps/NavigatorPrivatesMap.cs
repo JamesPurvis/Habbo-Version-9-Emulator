@@ -21,6 +21,9 @@ namespace Emulator.Game.Maps
             Map(x => x.room_status);
             Map(x => x.room_description);
             Map(x => x.room_category_id);
+            Map(x => x.room_model);
+            Map(x => x.room_password);
+            Map(x => x.room_all_super);
             Table("navigator_privates");
         }
     }

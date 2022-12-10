@@ -23,7 +23,7 @@ namespace Emulator.Messages.Outgoing.Navigator
             m_category_id = category_id;
             m_show_full = show_full;
             m_session = s;
-            m_category = DatabaseManager.returnEntity(m_category_id);
+            m_category = Startup.return_environment().return_navigator_manager().return_category_instance(m_category_id);
         }
 
         public void compose(HabboResponse response)
@@ -38,96 +38,73 @@ namespace Emulator.Messages.Outgoing.Navigator
 
             if (m_category.category_type == 2)
             {
-                response.writeInt(DatabaseManager.openSession().QueryOver<NavigatorPrivates>().Where(x => x.room_category_id == m_category_id).List().Count);
+                response.writeInt(m_category.return_room_count());
             }
 
+              if (m_category.category_type == 2)
+              {
+                  compile_children_rooms(response);
+              }
 
+             if (m_category.category_type == 0)
+             {
+                 compile_public_rooms(response);
+             }
 
-            if (m_category.category_type == 2)
-            {
-                response.write(compile_children_rooms().ToString());
-            }
-
-            if (m_category.category_type == 0)
-            {
-                response.write(compile_public_rooms().ToString());
-            }
-
-            response.write(compile_children_nodes().ToString());
+            compile_children_nodes(response);
 
         }
 
 
-        private StringBuilder compile_children_nodes()
+        private void compile_children_nodes(HabboResponse response)
         {
-            IList<NavigatorCategory> m_children = DatabaseManager.openSession().QueryOver<NavigatorCategory>().Where(x => x.category_parent_id == m_category_id).List();
-            StringBuilder m_builder = new StringBuilder();
 
-            foreach (NavigatorCategory child in m_children)
+            foreach (NavigatorCategory child in m_category.return_sub_categories())
             {
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(child.category_id)));
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(0)));
-                m_builder.Append(child.category_name);
-                m_builder.Append((char)2);
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(0)));
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(100)));
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(child.category_parent_id)));
+                response.writeInt(child.category_id);
+                response.writeInt(0);
+                response.writeString(child.category_name);
+                response.writeInt(0);
+                response.writeInt(100);
+                response.writeInt(child.category_parent_id);
             }
-
-            return m_builder;
 
         }
 
-        private StringBuilder compile_children_rooms()
+        private void compile_children_rooms(HabboResponse response)
         {
-             StringBuilder m_builder = new StringBuilder();
-            IList<NavigatorPrivates> m_children = DatabaseManager.openSession().QueryOver<NavigatorPrivates>().Where(x => x.room_category_id == m_category_id).List();
 
-            foreach(NavigatorPrivates child in m_children)
+            foreach (NavigatorPrivates child in m_category.return_child_rooms()) 
             {
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(child.room_id)));
-                m_builder.Append(child.room_name);
-                m_builder.Append((char)2);
-                m_builder.Append(child.room_owner);
-                m_builder.Append((char)2);
-                m_builder.Append(child.room_status);
-                m_builder.Append((char)2);
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(child.room_visitors)));
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(child.room_max_visitors)));
-                m_builder.Append(child.room_description);
-                m_builder.Append((char)2);
-
-
+               response.writeInt(child.room_id);
+               response.writeString(child.room_name);
+               response.writeString(child.room_owner);
+               response.writeString(child.room_status);
+               response.writeInt(child.room_visitors);
+               response.writeInt(child.room_max_visitors);
+               response.writeString(child.room_description);
             }
-
-            return m_builder;
         }
 
-        private StringBuilder compile_public_rooms()
+        private void compile_public_rooms(HabboResponse response)
         {
-            StringBuilder m_builder = new StringBuilder();
-            IList<NavigatorPublics> m_children = DatabaseManager.openSession().QueryOver<NavigatorPublics>().Where(x => x.room_category_id == m_category_id).List();
 
-            foreach(NavigatorPublics child in m_children)
+            foreach (NavigatorPublics child in m_category.return_child_rooms())
             {
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(child.room_id)));
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(1)));
-                m_builder.Append(child.room_name);
-                m_builder.Append((char)2);
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(child.room_current_visitors)));
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(child.room_max_visitors)));
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(child.room_category_id)));
-                m_builder.Append(child.room_description);
-                m_builder.Append((char)2);
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(child.room_id)));
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(0)));
-                m_builder.Append(child.room_cct);
-                m_builder.Append((char)2);
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(0)));
-                m_builder.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(1)));
-            }
+                response.writeInt(child.room_id + 1000);
+                response.writeInt(1);
+                response.writeString(child.room_name);
+                response.writeInt(child.room_current_visitors);
+                response.writeInt(child.room_max_visitors);
+                response.writeInt(child.room_category_id);
+                response.writeString(child.room_description);
+                response.writeInt(child.room_id);
+                response.writeInt(0);
+                response.writeString(child.room_cct);
+                response.writeInt(0);
+                response.writeInt(1);
 
-            return m_builder;
+            }
         }
 
 

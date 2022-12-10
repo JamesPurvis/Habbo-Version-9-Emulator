@@ -18,8 +18,9 @@ namespace Emulator.Messages.Outgoing.Navigator
         }
         public void compose(HabboResponse response)
         {
-            response.writeInt(m_id);
-            response.writeString(m_room_name);
+            response.write(m_id);
+            response.write((char)13);
+            response.write(m_room_name);
         }
 
         public short return_header_id()
