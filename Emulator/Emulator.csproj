@@ -18,6 +18,7 @@
     <PackageReference Include="log4net.Ext.Json" Version="2.0.10.1" />
     <PackageReference Include="MySql.Data" Version="8.0.31" />
     <PackageReference Include="MySqlConnector" Version="2.2.1" />
+    <PackageReference Include="RoyT.AStar" Version="3.0.2" />
   </ItemGroup>
 
   <ItemGroup>

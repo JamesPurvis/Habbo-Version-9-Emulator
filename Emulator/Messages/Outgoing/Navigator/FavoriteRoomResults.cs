@@ -60,7 +60,7 @@ namespace Emulator.Messages.Outgoing.Navigator
 
         public void compilePrivateList(NavigatorFavorites f, StringBuilder s)
         {
-            NavigatorPrivates m_instance = (NavigatorPrivates) DatabaseManager.returnFavoriteRoomInstance(f.room_id, f.room_type);
+            NavigatorRooms m_instance = DatabaseManager.returnFavoriteRoomInstance(f.room_id);
 
             s.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode((m_instance.room_id))));
             s.Append(m_instance.room_name);
@@ -80,13 +80,13 @@ namespace Emulator.Messages.Outgoing.Navigator
 
         public void compilePublicList(NavigatorFavorites f, StringBuilder s)
         {
-            NavigatorPublics m_instance = (NavigatorPublics) DatabaseManager.returnFavoriteRoomInstance(f.room_id, f.room_type);
+            NavigatorRooms m_instance = DatabaseManager.returnFavoriteRoomInstance(f.room_id);
 
             s.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode((f.room_id))));
             s.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(1)));
             s.Append(m_instance.room_name);
             s.Append((char)2);
-            s.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode((m_instance.room_current_visitors))));
+            s.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode((m_instance.room_visitors))));
             s.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(m_instance.room_max_visitors)));
             s.Append(Encoding.GetEncoding("ISO-8859-1").GetString(VL64Encoding.encode(m_instance.room_category_id)));
             s.Append(m_instance.room_description);

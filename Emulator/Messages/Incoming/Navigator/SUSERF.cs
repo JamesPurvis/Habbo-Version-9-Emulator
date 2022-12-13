@@ -15,7 +15,7 @@ namespace Emulator.Messages.Incoming.Navigator
     {
         public void invokeEvent(HabboRequest r, GameSession s)
         {
-            IList<NavigatorPrivates> m_room_list = DatabaseManager.returnRoomByOwner(s.returnUser.user_name);
+            IList<NavigatorRooms> m_room_list = DatabaseManager.returnRoomByOwner(s.returnUser.user_name);
 
             if (m_room_list.Count > 0)
             {

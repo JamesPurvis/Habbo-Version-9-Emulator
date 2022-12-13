@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Emulator.Game.Models
 {
-    public class NavigatorPrivates
+    public class NavigatorRooms
     {
         public virtual int room_id { get; set; }
         public virtual string room_name { get; set; }
@@ -30,6 +30,8 @@ namespace Emulator.Game.Models
         public virtual Boolean room_all_super { get; set; }
 
         public virtual string room_password { get; set; }
+
+        public virtual string room_cct { get; set; }
 
     }
 }

@@ -19,7 +19,7 @@ namespace Emulator.Messages.Incoming.Navigator
         {
             string m_search_term = r.return_body();
 
-            IList<NavigatorPrivates> m_search_result = DatabaseManager.searchForRooms(m_search_term);
+            IList<NavigatorRooms> m_search_result = DatabaseManager.searchForRooms(m_search_term);
 
             if (m_search_result.Count > 0)
             {

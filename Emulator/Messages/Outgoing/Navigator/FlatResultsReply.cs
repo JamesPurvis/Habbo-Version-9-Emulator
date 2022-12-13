@@ -13,16 +13,16 @@ namespace Emulator.Messages.Outgoing.Navigator
 {
     public class FlatResultsReply : MessageComposer
     {
-        private IList<NavigatorPrivates> m_room_list;
+        private IList<NavigatorRooms> m_room_list;
 
-        public FlatResultsReply(IList<NavigatorPrivates> m_room_list)
+        public FlatResultsReply(IList<NavigatorRooms> m_room_list)
         {
             this.m_room_list = m_room_list;
         }
         public void compose(HabboResponse response)
         {
 
-            foreach (NavigatorPrivates room in m_room_list)
+            foreach (NavigatorRooms room in m_room_list)
             {
                 response.write(room.room_id);
                 response.write((char)9);

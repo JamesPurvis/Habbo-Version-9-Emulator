@@ -31,7 +31,7 @@ namespace Emulator.Messages.Incoming.Navigator
            int m_all_super = int.Parse(roomDetails[3].Split('=')[1]);
           string m_password = roomDetails[2].Split('=')[1];
 
-            NavigatorPrivates m_room = DatabaseManager.return_user_room(m_room_id);
+            NavigatorRooms m_room = DatabaseManager.return_user_room(m_room_id);
 
             m_room.room_description = m_description;
             m_room.room_all_super = m_all_super == 1;

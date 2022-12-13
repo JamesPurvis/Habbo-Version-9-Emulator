@@ -18,6 +18,9 @@ using Emulator.Messages.Outgoing.Global;
 using Emulator.Messages.Outgoing.Navigator;
 using Emulator.Messages.Incoming.Messenger;
 using Google.Protobuf.Reflection;
+using Emulator.Messages.Incoming.Rooms;
+using Emulator.Messages.Outgoing.Room;
+using Emulator.Messages.Incoming.Rooms.Users;
 
 namespace Emulator.Messages
 {
@@ -61,6 +64,21 @@ namespace Emulator.Messages
             m_packet_handlers[21] = new GETFLATINFO();
             m_packet_handlers[152] = new GETFLATCAT();
             m_packet_handlers[24] = new UPDATEFLAT();
+            m_packet_handlers[44] = new UPDATE();
+            m_packet_handlers[182] = new GETINTEREST();
+            m_packet_handlers[2] = new ROOMDIRECTORY();
+            m_packet_handlers[57] = new TRYFLAT();
+            m_packet_handlers[59] = new GOTOFLAT();
+            m_packet_handlers[60] = new G_HMAP();
+            m_packet_handlers[62] = new G_OBJS();
+            m_packet_handlers[63] = new G_ITEMS();
+            m_packet_handlers[61] = new G_USERS();
+            m_packet_handlers[126] = new GETROOMAD();
+            m_packet_handlers[52] = new CHAT();
+            m_packet_handlers[55] = new SHOUT();
+            m_packet_handlers[56] = new WHISPER();
+            m_packet_handlers[75] = new WALK();
+
 
         }
 

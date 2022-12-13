@@ -23,7 +23,7 @@ namespace Emulator.Messages.Incoming.Navigator
             string m_room_status = m_room_details[2];
             int m_room_show_owner = int.Parse(m_room_details[3]);
 
-            NavigatorPrivates m_room = DatabaseManager.return_user_room(int.Parse(m_room_details[0]));
+            NavigatorRooms m_room = DatabaseManager.return_user_room(int.Parse(m_room_details[0]));
 
             m_room.room_name = m_room_name;
             m_room.room_status = m_room_status;
