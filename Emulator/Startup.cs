@@ -20,7 +20,7 @@ public static class Startup
         }
         catch(Exception e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine(e.InnerException.Message);
         }
         finally
         {

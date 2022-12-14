@@ -27,7 +27,7 @@ namespace Emulator.Messages.Outgoing.Room
                 response.write("i:" + user.m_user_model.user_id + Convert.ToChar(13));
                 response.write("n:" + user.m_user_model.user_name + Convert.ToChar(13));
                 response.write("f:" + user.m_user_model.user_figure + Convert.ToChar(13));
-                response.write("l:" + DatabaseManager.return_door(m_instance) + Convert.ToChar(13));
+                response.write("l:" + user.m_current_x + ", " + user.m_current_y + ", " + "0.0" + Convert.ToChar(13));
                 response.write("s:" + user.m_user_model.user_gender + Convert.ToChar(13));
                 response.write("c:" + user.m_user_model.user_mission + Convert.ToChar(13));
             }

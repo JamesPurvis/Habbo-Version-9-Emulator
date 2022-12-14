@@ -1,4 +1,5 @@
-﻿using Emulator.Game.Models;
+﻿using Emulator.Game.Database;
+using Emulator.Game.Models;
 using NHibernate.Util;
 using System;
 using System.Collections.Generic;
@@ -13,22 +14,30 @@ namespace Emulator.Game.Rooms
         private LinkedHashMap<int, Room> m_room_map;
         public RoomManager()
         {
-
+            m_room_map = new LinkedHashMap<int, Room>();
         }
 
         public void loadRoomIntoMemory(Room instance)
         {
-            if (m_room_map == null)
-            {
-                m_room_map = new LinkedHashMap<int, Room>();
-            }
-
             m_room_map.Add(instance.return_room_id, instance);
         }
 
         public Room returnRoomInstance(int room_id)
         {
-            return m_room_map[room_id];
+            NavigatorRooms instance = DatabaseManager.return_user_room(room_id);
+            Room m_room;
+
+            if (!m_room_map.Contains(room_id))
+            {
+                m_room = new Room(room_id, instance);
+                loadRoomIntoMemory(m_room);
+            }
+            else
+            {
+                m_room = m_room_map[room_id];
+            }
+
+            return m_room;
         }
 
         public RoomUser returnNewRoomUser(UserModel u, Room instance)

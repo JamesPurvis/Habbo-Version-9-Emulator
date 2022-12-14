@@ -33,7 +33,7 @@ namespace Emulator.Game.Database
             try
             {
                 m_session_factory = Fluently.Configure()
-               .Database(MySQLConfiguration.Standard.ConnectionString("Server=localhost;Database=habboserver;Uid=root;Pwd=;"))
+               .Database(MySQLConfiguration.Standard.ConnectionString("Server=localhost;Database=habboserver;Uid=root;Pwd=$$Newnew99;"))
               .Mappings(m => m.FluentMappings
              .AddFromAssemblyOf<Environment>())
              .ExposeConfiguration(cfg => new SchemaUpdate(cfg).Execute(true, true))
@@ -45,6 +45,7 @@ namespace Emulator.Game.Database
                 Logging.Logging.m_Logger.Error(e.Message);
             }
             
+            finally
             {
                 Logging.Logging.m_Logger.Debug("Connected to mySQL database successfully.");
             }

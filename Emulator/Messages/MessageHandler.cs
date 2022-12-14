@@ -21,6 +21,7 @@ using Google.Protobuf.Reflection;
 using Emulator.Messages.Incoming.Rooms;
 using Emulator.Messages.Outgoing.Room;
 using Emulator.Messages.Incoming.Rooms.Users;
+using Emulator.Messages.Incoming.Catalog;
 
 namespace Emulator.Messages
 {
@@ -78,6 +79,8 @@ namespace Emulator.Messages
             m_packet_handlers[55] = new SHOUT();
             m_packet_handlers[56] = new WHISPER();
             m_packet_handlers[75] = new WALK();
+            m_packet_handlers[101] = new GCIX();
+            m_packet_handlers[102] = new GCAP();
 
 
         }

@@ -21,5 +21,13 @@ namespace Emulator.Game.Rooms
             this.return_room_users = new List<RoomUser>();
             this.return_room_info = instance;
         }
+
+        public void SendToRoom(Object o)
+        {
+            foreach(RoomUser r in return_room_users)
+            {
+                r.m_game_session.SendToSession(o);
+            }
+        }
     }
 }

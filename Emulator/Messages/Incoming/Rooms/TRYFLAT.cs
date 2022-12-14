@@ -17,10 +17,20 @@ namespace Emulator.Messages.Incoming.Rooms
         public void invokeEvent(HabboRequest r, GameSession s)
         {
             int m_room_id = int.Parse(r.return_body());
-            NavigatorRooms m_room_model = DatabaseManager.return_user_room(m_room_id);
             //do doorbell stuff
 
-            Room m_room_instance = new Room(m_room_id, m_room_model);
+            Room m_room_instance = null;
+
+            try
+            {
+                 m_room_instance = Startup.return_environment().return_room_manager().returnRoomInstance(m_room_id);
+            }
+
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
 
             s.return_room_instance = m_room_instance;
 

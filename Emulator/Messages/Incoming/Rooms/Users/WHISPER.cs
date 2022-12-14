@@ -17,7 +17,7 @@ namespace Emulator.Messages.Incoming.Rooms.Users
             string m_text = r.popString();
             int m_id = s.returnUser.user_id;
 
-            s.SendToSession(new WhisperReply(m_id, m_text));
+            s.return_room_instance.SendToRoom(new WhisperReply(m_id, m_text));
         }
     }
 }

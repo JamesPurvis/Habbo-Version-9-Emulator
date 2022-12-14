@@ -46,20 +46,28 @@ public class Environment
     {
         return m_pathfinder;
     }
+
     public Environment()
     {
        Logging.m_Logger.Info("A server environment has been intialized successfully.");
         m_server_bootstrap = new ServerBootStrap();
         Logging.m_Logger.Info("A server bootstrap has been intialized successfully.");
         m_server_bootstrap.beginListening("10.0.0.23", 30000);
-        m_message_handler = new MessageHandler();
-        m_database_manager = new DatabaseManager();
-        m_session_manager = new SessionManager();
-        m_navigator_manager = new NavigatorManager();
-        m_room_manager = new RoomManager();
-        m_pathfinder = new Pathfinding();
 
+        try
+        {
+            m_message_handler = new MessageHandler();
+            m_database_manager = new DatabaseManager();
+            m_session_manager = new SessionManager();
+           m_navigator_manager = new NavigatorManager();
+           m_room_manager = new RoomManager();
+            m_pathfinder = new Pathfinding();
 
-        m_navigator_manager.LoadNavigator();
+            m_navigator_manager.LoadNavigator();
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }

@@ -44,4 +44,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Game\Catalog\" />
+  </ItemGroup>
 </Project>
