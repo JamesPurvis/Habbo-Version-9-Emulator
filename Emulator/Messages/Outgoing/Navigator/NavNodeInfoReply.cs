@@ -74,7 +74,7 @@ namespace Emulator.Messages.Outgoing.Navigator
         private void compile_children_rooms(HabboResponse response)
         {
 
-            foreach (NavigatorPrivates child in m_category.return_child_rooms()) 
+            foreach (NavigatorRooms child in m_category.return_child_rooms()) 
             {
                response.writeInt(child.room_id);
                response.writeString(child.room_name);
@@ -89,12 +89,12 @@ namespace Emulator.Messages.Outgoing.Navigator
         private void compile_public_rooms(HabboResponse response)
         {
 
-            foreach (NavigatorPublics child in m_category.return_child_rooms())
+            foreach (NavigatorRooms child in m_category.return_child_rooms())
             {
                 response.writeInt(child.room_id + 1000);
                 response.writeInt(1);
                 response.writeString(child.room_name);
-                response.writeInt(child.room_current_visitors);
+                response.writeInt(child.room_visitors);
                 response.writeInt(child.room_max_visitors);
                 response.writeInt(child.room_category_id);
                 response.writeString(child.room_description);

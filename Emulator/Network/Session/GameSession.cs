@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DotNetty.Transport.Channels;
 using Emulator.Game.Messenger;
 using Emulator.Game.Models;
+using Emulator.Game.Rooms;
 using Emulator.Network.Streams;
 using NHibernate;
 using Org.BouncyCastle.Crypto.Signers;
@@ -19,6 +20,8 @@ namespace Emulator.Network.Session
         private UserModel m_user;
         private ISession m_database_session;
         private HabboMessenger m_messenger;
+        private Room m_room_instance;
+        private RoomUser m_room_user_instance;
         public IChannel returnChannel
         {
             get {  return m_channel; }
@@ -39,6 +42,18 @@ namespace Emulator.Network.Session
         {
             set { m_messenger = value;  }
             get { return m_messenger; }
+        }
+
+        public Room return_room_instance
+        {
+            get { return m_room_instance;  }
+            set { m_room_instance = value;  }
+        }
+
+        public RoomUser return_room_user
+        {
+            get { return m_room_user_instance;  }
+            set { m_room_user_instance = value; }
         }
 
         public GameSession(IChannelHandlerContext c)

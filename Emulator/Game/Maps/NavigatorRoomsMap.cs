@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Emulator.Game.Maps
 {
-    public class NavigatorPrivatesMap : ClassMap<NavigatorPrivates>
+    public class NavigatorRoomsMap : ClassMap<NavigatorRooms>
     {
-        public NavigatorPrivatesMap()
+        public NavigatorRoomsMap()
         {
             Id(x => x.room_id).GeneratedBy.Identity();
             Map(x => x.room_name);
@@ -24,7 +24,8 @@ namespace Emulator.Game.Maps
             Map(x => x.room_model);
             Map(x => x.room_password);
             Map(x => x.room_all_super);
-            Table("navigator_privates");
+            Map(x => x.room_cct);
+            Table("navigator_rooms");
         }
     }
     

@@ -17,7 +17,7 @@ namespace Emulator.Messages.Incoming.Navigator
             int m_room_id = r.popInteger();
             int m_category_id = r.popInteger();
 
-            NavigatorPrivates m_room = DatabaseManager.return_user_room(m_room_id);
+            NavigatorRooms m_room = DatabaseManager.return_user_room(m_room_id);
             m_room.room_category_id = m_category_id;
             DatabaseManager.UpdateUserRoom(m_room);
         }

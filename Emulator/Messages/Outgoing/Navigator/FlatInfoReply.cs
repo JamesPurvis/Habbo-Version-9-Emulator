@@ -19,7 +19,7 @@ namespace Emulator.Messages.Outgoing.Navigator
         public void compose(HabboResponse response)
         {
             
-            NavigatorPrivates m_room = DatabaseManager.return_user_room(room_id);
+            NavigatorRooms m_room = DatabaseManager.return_user_room(room_id);
 
               if (m_room.room_all_super == true) response.writeInt(1);
               if (m_room.room_all_super == false) response.writeInt(0);

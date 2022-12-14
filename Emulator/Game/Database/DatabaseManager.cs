@@ -1,5 +1,6 @@
 ﻿using Emulator.Game.Messenger;
 using Emulator.Game.Models;
+using Emulator.Game.Rooms;
 using Emulator.Network.Session;
 using Emulator.Network.Streams;
 using FluentNHibernate.Cfg;
@@ -32,7 +33,7 @@ namespace Emulator.Game.Database
             try
             {
                 m_session_factory = Fluently.Configure()
-               .Database(MySQLConfiguration.Standard.ConnectionString("Server=localhost;Database=habboserver;Uid=root;Pwd=;"))
+               .Database(MySQLConfiguration.Standard.ConnectionString("Server=localhost;Database=habboserver;Uid=root;Pwd=$$Newnew99;"))
               .Mappings(m => m.FluentMappings
              .AddFromAssemblyOf<Environment>())
              .ExposeConfiguration(cfg => new SchemaUpdate(cfg).Execute(true, true))
@@ -44,6 +45,7 @@ namespace Emulator.Game.Database
                 Logging.Logging.m_Logger.Error(e.Message);
             }
             
+            finally
             {
                 Logging.Logging.m_Logger.Debug("Connected to mySQL database successfully.");
             }
@@ -84,13 +86,13 @@ namespace Emulator.Game.Database
             return m_category;
         }
 
-        public static IList<NavigatorPrivates> returnRoomByOwner(String owner)
+        public static IList<NavigatorRooms> returnRoomByOwner(String owner)
         {
-            IList<NavigatorPrivates> m_list = null;
+            IList<NavigatorRooms> m_list = null;
 
             using (ISession m_session = openSession())
             {
-                m_list = m_session.Query<NavigatorPrivates>().Where(x => x.room_owner == owner).ToList();
+                m_list = m_session.Query<NavigatorRooms>().Where(x => x.room_owner == owner).ToList();
 
                 m_session.Close();
             }
@@ -392,7 +394,7 @@ namespace Emulator.Game.Database
 
         public static int createNewRoom(string name, string model, string status, int showowner)
         {
-            NavigatorPrivates m_new_room = new NavigatorPrivates();
+            NavigatorRooms m_new_room = new NavigatorRooms();
 
             using (ISession m_session = openSession())
             {
@@ -409,19 +411,19 @@ namespace Emulator.Game.Database
             return m_new_room.room_id;
         }
 
-        public static NavigatorPrivates return_user_room(int id)
+        public static NavigatorRooms return_user_room(int id)
         {
-            NavigatorPrivates m_room;
+            NavigatorRooms m_room;
 
             using (ISession m_session = openSession())
             {
-                m_room = m_session.QueryOver<NavigatorPrivates>().Where(x => x.room_id == id).SingleOrDefault();
+                m_room = m_session.QueryOver<NavigatorRooms>().Where(x => x.room_id == id).SingleOrDefault();
                 m_session.Close();
             }
 
             return m_room;
         }
-        public static void UpdateUserRoom(NavigatorPrivates room)
+        public static void UpdateUserRoom(NavigatorRooms room)
         { 
             using (ISession m_session = openSession())
             {
@@ -431,11 +433,11 @@ namespace Emulator.Game.Database
             }
         }
 
-        public static IList<NavigatorPrivates> searchForRooms(String query)
+        public static IList<NavigatorRooms> searchForRooms(String query)
         {
             string m_owner_name = query.Replace("%", "");
             Console.WriteLine("This is query: " + query);
-            IList<NavigatorPrivates> m_search_result;
+            IList<NavigatorRooms> m_search_result;
 
             using (ISession m_session = openSession())
             {
@@ -445,7 +447,7 @@ namespace Emulator.Game.Database
                // }
                // else
               //  {
-                    m_search_result = m_session.CreateSQLQuery("SELECT * FROM navigator_privates WHERE room_name LIKE :query OR room_owner = :query2").SetParameter("query", query).SetParameter("query2", m_owner_name).SetResultTransformer((Transformers.AliasToBean<NavigatorPrivates>())).List<NavigatorPrivates>().ToList();
+                    m_search_result = m_session.CreateSQLQuery("SELECT * FROM navigator_rooms WHERE room_name LIKE :query OR room_owner = :query2").SetParameter("query", query).SetParameter("query2", m_owner_name).SetResultTransformer((Transformers.AliasToBean<NavigatorRooms>())).List<NavigatorRooms>().ToList();
                 //}
 
                 m_session.Close();
@@ -480,20 +482,14 @@ namespace Emulator.Game.Database
             return m_favorites;
         }
 
-        public static object returnFavoriteRoomInstance(int room_id, int type)
+        public static NavigatorRooms returnFavoriteRoomInstance(int room_id)
         {
-            object m_instance;
+            NavigatorRooms m_instance;
 
             using(ISession m_session = openSession())
             {
-                if (type == 1)
-                {
-                    m_instance = m_session.Query<NavigatorPublics>().Where(x => x.room_id == room_id).SingleOrDefault();
-                }
-                else
-                {
-                    m_instance = m_session.Query<NavigatorPrivates>().Where(x => x.room_id == room_id).SingleOrDefault();
-                }
+    
+              m_instance = m_session.Query<NavigatorRooms>().Where(x => x.room_id == room_id).SingleOrDefault();
 
                 m_session.Close();
             }
@@ -534,9 +530,48 @@ namespace Emulator.Game.Database
             using (ISession m_session = openSession())
             {
                 m_count = m_session.QueryOver<NavigatorFavorites>().Where(x => x.room_type == 0).RowCount();
+                m_session.Close();
             }
 
             return m_count;
         }
+
+        public static void updateUserAccount(UserModel m)
+        {
+            using (ISession m_session = openSession())
+            {
+                m_session.Update(m);
+                m_session.Flush();
+                m_session.Close();
+            }
+        }
+
+        public static string return_heightmap(Emulator.Game.Rooms.Room instance)
+        {
+            string m_model_name = instance.return_room_info.room_model;
+            string m_heightmap;
+
+            using (ISession m_session = openSession())
+            {
+                m_heightmap = m_session.QueryOver<NavigatorModels>().Where(x => x.model_name == m_model_name).SingleOrDefault().model_map;
+            }
+
+            return m_heightmap.Replace('|', Convert.ToChar(13));
+        }
+
+        public static string return_door(Emulator.Game.Rooms.Room instance)
+        {
+            string m_model_name = instance.return_room_info.room_model;
+            string m_model_door;
+
+            using (ISession m_session = openSession())
+            {
+                m_model_door = m_session.QueryOver<NavigatorModels>().Where(x => x.model_name == m_model_name).SingleOrDefault().model_door;
+            }
+
+            return m_model_door;
+        }
+
+
     }
 }

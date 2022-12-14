@@ -37,7 +37,7 @@ namespace Emulator.Game.Models
 
             using (ISession m_session = DatabaseManager.openSession())
             {
-                m_count = m_session.QueryOver<NavigatorPrivates>().Where(x => x.room_category_id == category_id).RowCount();
+                m_count = m_session.QueryOver<NavigatorRooms>().Where(x => x.room_category_id == category_id).RowCount();
                 m_session.Close();
             }
 
@@ -52,16 +52,9 @@ namespace Emulator.Game.Models
 
             using (ISession m_session = DatabaseManager.openSession())
             {
-                if (category_type == 0)
-                {
-                    m_room_list = (IList)m_session.QueryOver<NavigatorPublics>().Where(x => x.room_category_id == category_id).List();
-                }
-                else
-                {
-                    m_room_list = (IList)m_session.QueryOver<NavigatorPrivates>().Where(x => x.room_category_id == category_id).List();
-                }
-
-                m_session.Close();
+   
+                 m_room_list = (IList)m_session.QueryOver<NavigatorRooms>().Where(x => x.room_category_id == category_id).List();
+                 m_session.Close();
             }
 
             return m_room_list;

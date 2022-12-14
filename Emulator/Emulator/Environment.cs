@@ -4,6 +4,8 @@ using Emulator.Messages;
 using Emulator.Game.Database;
 using Emulator.Network.Session;
 using Emulator.Game.Navigator;
+using Emulator.Game.Rooms;
+using Emulator.Game.Room;
 
 public class Environment
 {
@@ -13,6 +15,8 @@ public class Environment
     private DatabaseManager m_database_manager = null;
     private SessionManager m_session_manager = null;
     private NavigatorManager m_navigator_manager = null;
+    private RoomManager m_room_manager = null;
+    private Pathfinding m_pathfinder = null;
     public MessageHandler return_message_handler()
     {
         return m_message_handler;
@@ -33,18 +37,37 @@ public class Environment
         return m_navigator_manager;
     }
 
+    public RoomManager return_room_manager()
+    {
+        return m_room_manager;
+    }
+
+    public Pathfinding return_pathfinder()
+    {
+        return m_pathfinder;
+    }
+
     public Environment()
     {
        Logging.m_Logger.Info("A server environment has been intialized successfully.");
         m_server_bootstrap = new ServerBootStrap();
         Logging.m_Logger.Info("A server bootstrap has been intialized successfully.");
         m_server_bootstrap.beginListening("10.0.0.23", 30000);
-        m_message_handler = new MessageHandler();
-        m_database_manager = new DatabaseManager();
-        m_session_manager = new SessionManager();
-        m_navigator_manager = new NavigatorManager();
 
+        try
+        {
+            m_message_handler = new MessageHandler();
+            m_database_manager = new DatabaseManager();
+            m_session_manager = new SessionManager();
+           m_navigator_manager = new NavigatorManager();
+           m_room_manager = new RoomManager();
+            m_pathfinder = new Pathfinding();
 
-        m_navigator_manager.LoadNavigator();
+            m_navigator_manager.LoadNavigator();
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }
