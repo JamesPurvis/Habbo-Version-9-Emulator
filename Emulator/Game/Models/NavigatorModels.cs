@@ -14,5 +14,9 @@ namespace Emulator.Game.Models
         public virtual string model_map { get; set; }
 
         public virtual string model_door { get; set; }
+
+        public virtual int model_rows { get; set; }
+
+        public virtual int model_columns { get; set; }
     }
 }

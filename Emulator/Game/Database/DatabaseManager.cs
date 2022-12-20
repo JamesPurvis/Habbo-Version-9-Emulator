@@ -556,7 +556,7 @@ namespace Emulator.Game.Database
                 m_heightmap = m_session.QueryOver<NavigatorModels>().Where(x => x.model_name == m_model_name).SingleOrDefault().model_map;
             }
 
-            return m_heightmap.Replace('|', Convert.ToChar(13));
+            return m_heightmap.Replace(' ', Convert.ToChar(13));
         }
 
         public static string return_door(Emulator.Game.Rooms.Room instance)
@@ -570,6 +570,19 @@ namespace Emulator.Game.Database
             }
 
             return m_model_door;
+        }
+
+        public static NavigatorModels return_room_model(string model_name)
+        {
+            NavigatorModels m_model;
+
+            using (ISession m_session = openSession())
+            {
+                m_model = m_session.Query<NavigatorModels>().Where(x => x.model_name == model_name).SingleOrDefault();
+                m_session.Close();
+            }
+
+            return m_model;
         }
 
 

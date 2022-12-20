@@ -16,6 +16,8 @@ namespace Emulator.Game.Maps
             Map(x => x.model_name);
             Map(x => x.model_map);
             Map(x => x.model_door);
+            Map(x => x.model_rows);
+            Map(x => x.model_columns);
             Table("navigator_models");
         }
     }

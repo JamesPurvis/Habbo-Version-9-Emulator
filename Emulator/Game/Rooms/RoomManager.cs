@@ -1,5 +1,6 @@
 ﻿using Emulator.Game.Database;
 using Emulator.Game.Models;
+using Emulator.Network.Session;
 using NHibernate.Util;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace Emulator.Game.Rooms
             return m_room;
         }
 
-        public RoomUser returnNewRoomUser(UserModel u, Room instance)
+        public RoomUser returnNewRoomUser(GameSession s, UserModel u, Room instance)
         {
             RoomUser new_room_user = null;
 
@@ -49,12 +50,13 @@ namespace Emulator.Game.Rooms
                 new_room_user = new RoomUser(u);
             }
 
+            s.return_room_user = new_room_user;
+            s.return_room_user.m_game_session = s;
+
+            instance.return_room_users.Add(new_room_user);
+
             return new_room_user;
         }
 
-        public void mapToRoom(RoomUser r, Room instance)
-        {
-            instance.return_room_users.Add(r);
-        }
     }
 }

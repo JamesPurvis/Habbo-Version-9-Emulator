@@ -5,6 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <StartupObject>Startup</StartupObject>
+	  <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,5 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Game\Catalog\" />
+    <Folder Include="Game\Rooms\Pathfinding\" />
   </ItemGroup>
 </Project>

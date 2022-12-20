@@ -12,6 +12,15 @@ using Roy_T.AStar.Graphs;
 using Emulator.Network.Session;
 using Emulator.Messages.Outgoing.Room.Users;
 using Emulator.Messages.Incoming.Register;
+using Roy_T.AStar.Grids;
+using Roy_T.AStar.Primitives;
+using Roy_T.AStar.Serialization;
+using NHibernate.Mapping.ByCode;
+using System.Collections;
+using Emulator.Game.Rooms.Pathfinding;
+using System.Security.AccessControl;
+using Microsoft.Extensions.Logging.Abstractions;
+using NHibernate.Engine;
 
 namespace Emulator.Game.Rooms
 {
@@ -21,53 +30,190 @@ namespace Emulator.Game.Rooms
         public int m_current_x { get; set; }
         public int m_current_y { get; set; }
 
+        public int m_goal_x { get; set; }
+
+        public int m_goal_y { get; set; }
+
+        public List<PathFinderNode> m_path { get; set; }
+
+        public Boolean m_requires_update { get; set; }
+
         public GameSession m_game_session { get; set; }
+
+        public RoomUserStatus[] m_user_statuses { get; set; }
+
+        public byte m_head_rotation { get; set; }
+
+        public byte m_body_rotation { get; set; }
+
+        public Boolean m_override_next_tile { get; set; }
+
+        public byte m_movement_retries { get; set; }
+
+        public float m_current_z { get; set; }
         public RoomUser(UserModel user_model)
         {
+            m_user_statuses = new RoomUserStatus[5];
             m_user_model = user_model;
+            this.m_path = new List<PathFinderNode>();
         }
 
-        public void HandleMovement(int goal_x, int goal_y, GameSession s, Roy_T.AStar.Paths.Path p)
+        public Boolean requiresUpdate()
         {
-            string head_rotation = "";
-            string body_rotation = "";
-
-            foreach(var edge in p.Edges)
+            if (m_requires_update)
             {
-                s.return_room_user.m_current_x = (int)edge.Start.Position.X;
-                s.return_room_user.m_current_y = (int)edge.Start.Position.Y;
-              
-                    StringBuilder m_post_stat = new StringBuilder();
-
-                    m_post_stat.Append("/mv ");
-                    m_post_stat.Append(edge.End.Position.X);
-                    m_post_stat.Append(",");
-                    m_post_stat.Append(edge.End.Position.Y);
-                    m_post_stat.Append(",");
-                    m_post_stat.Append("0.0");
-
-                head_rotation = Utils.SpecialMath.WorkDirection(m_current_x, m_current_y, (int)edge.End.Position.X, (int)edge.End.Position.Y).ToString();
-                body_rotation = Utils.SpecialMath.WorkDirection(m_current_x, m_current_y, (int)edge.End.Position.X, (int)edge.End.Position.Y).ToString();
-
-
-                    s.return_room_instance.SendToRoom(new UserStatusReply("mv", s, goal_x, goal_y, head_rotation, body_rotation, m_post_stat.ToString()));
-
-
-                Thread.Sleep(374);
-
+                return true;
+            }
+            else
+            {
+                for (int a = 0; a < 5; a++)
+                {
+                    if (m_user_statuses[a] != null && m_user_statuses[a].isUpdated())
+                    {
+                        return true;
+                    }
+                }
             }
 
-            m_current_x = goal_x;
-            m_current_y = goal_y;
-
-            s.return_room_instance.SendToRoom(new UserStatusReply("", s, m_current_x, m_current_y, head_rotation, body_rotation, ""));
+            return false;
         }
 
-        public Thread StartWalking(Roy_T.AStar.Paths.Path p, int goal_x, int goal_y, GameSession s)
+        public void ensureUpdate(Boolean state)
         {
-            Thread t = new Thread(() => HandleMovement(goal_x, goal_y, s, p));
-            t.Start();
-            return t;
+            m_requires_update = state;
+        }
+
+        public Boolean addStatus(String name, string data, int lifeTimeSeconds, string action, int actionSwitchSeconds, int actionLengthSeconds)
+        {
+            removeStatus(name);
+
+            for (int a = 0; a < 5; a++)
+            {
+                if (m_user_statuses[a] == null)
+                {
+                    m_user_statuses[a] = new RoomUserStatus(name, data, lifeTimeSeconds, action, actionSwitchSeconds, actionLengthSeconds);
+                    m_requires_update = true;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public Boolean removeStatus(string name)
+        {
+            for (int a = 0; a < 5; a++)
+            {
+                if (m_user_statuses[a] != null && m_user_statuses[a].m_name.Equals(name))
+                {
+                    m_user_statuses[a] = null;
+                    m_requires_update = true;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public Boolean hasStatus(String name)
+        {
+            for (int a = 0; a < 5; a++)
+            {
+                if (m_user_statuses[a] != null && m_user_statuses[a].m_name.Equals(name))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void removeInteractiveStatuses()
+        {
+            this.removeStatus("sit");
+            this.removeStatus("lay");
+        }
+
+        public void clearPath()
+        {
+            this.m_goal_x = -1;
+            this.m_goal_y = 0;
+            this.m_path.Clear();
+        }
+
+        public String returnUserStatusString()
+        {
+            StringBuilder m_builder = new StringBuilder();
+
+            m_builder.Append(m_game_session.returnUser.user_id);
+            m_builder.Append(" ");
+            m_builder.Append(m_game_session.return_room_user.m_current_x);
+            m_builder.Append(",");
+            m_builder.Append(m_game_session.return_room_user.m_current_y);
+            m_builder.Append(",");
+            m_builder.Append("0.0");
+            m_builder.Append(",");
+            m_builder.Append(m_game_session.return_room_user.m_head_rotation);
+            m_builder.Append(",");
+            m_builder.Append(m_game_session.return_room_user.m_body_rotation);
+            m_builder.Append("/");
+
+            for (int a = 0; a < 5; a++)
+            {
+                RoomUserStatus m_status = m_user_statuses[a];
+
+                if (m_status != null)
+                {
+                    if (m_status.checkStatus())
+                    {
+                        m_builder.Append(m_status.m_name);
+
+                        if (m_status.m_data != null)
+                        {
+                            m_builder.Append(' ');
+                            m_builder.Append(m_status.m_data);
+                        }
+
+                        m_builder.Append('/');
+
+                    }
+                    else
+                    {
+                        m_user_statuses[a] = null;
+                    }
+                }
+            }
+
+
+            return m_builder.ToString();
+        }
+
+        public void angleHeadTo(int toX, int toY)
+        {
+            int diff = this.m_body_rotation - Utils.SpecialMath.WorkDirection(this.m_current_x, this.m_current_y, toX, toY);
+
+            if (this.m_body_rotation % 2 == 0)
+            {
+                if (diff > 0)
+                {
+                    this.m_head_rotation = (byte)(this.m_body_rotation - 1);
+                }
+
+                else if (diff < 0)
+                {
+                    this.m_head_rotation = (byte)(this.m_body_rotation + 1);
+                }
+
+                else
+                {
+                    this.m_head_rotation = this.m_body_rotation;
+                }
+            }
+
+            this.ensureUpdate(true);
+
+
         }
     }
-}
+    }
+        
